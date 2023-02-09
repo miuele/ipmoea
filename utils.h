@@ -19,36 +19,6 @@ struct iir_result_not_set {
 	}
 };
 
-template <class T, int N>
-struct iir_input;
-
-template <class T, int N>
-struct iir_output;
-
-namespace detail {
-
-template <class T, int N, int I>
-constexpr const T &iir_input_z(const iir_input<T, N> &o, std::integral_constant<int, I>) {
-	return o.seq_.template top<(-I - 1)>();
-}
-
-template <class T, int N>
-constexpr const T &iir_input_z(const iir_input<T, N> &o, std::integral_constant<int, 0>) {
-	return o.top_;
-}
-
-template <class T, int N, int I>
-constexpr const T &iir_output_z(const iir_output<T, N> &o, std::integral_constant<int, I>) {
-	return o.seq_.template top<(-I - 1)>();
-}
-
-template <class T, int N>
-constexpr iir_result_not_set<T> iir_output_z(const iir_output<T, N> &o, std::integral_constant<int, 0>) {
-	return iir_result_not_set<T>{};
-}
-
-}
-
 using ::zseq::zsequence;
 
 template <class T, int N>
@@ -61,15 +31,19 @@ struct iir_input {
 	template <int I>
 	constexpr const T &z() const {
 		static_assert(I <= 0, "I must satisfy I <= 0");
-		return detail::iir_input_z(*this, std::integral_constant<int, I>{});
+		return iir_input_z(std::integral_constant<int, I>{});
 	}
 
 private:
-	template <class U, int M, int I>
-	friend constexpr const U &detail::iir_input_z(const iir_input<U, M> &, std::integral_constant<int, I>);
 
-	template <class U, int M>
-	friend constexpr const U &detail::iir_input_z(const iir_input<U, M> &, std::integral_constant<int, 0>);
+	template <int I>
+	constexpr const T &iir_input_z(std::integral_constant<int, I>) const {
+		return seq_.template top<(-I - 1)>();
+	}
+
+	constexpr const T &iir_input_z(std::integral_constant<int, 0>) const {
+		return top_;
+	}
 
 	T top_;
 	const zsequence<T, N> &seq_;
@@ -102,15 +76,19 @@ struct iir_output {
 	template <int I>
 	constexpr decltype(auto) z() const {
 		static_assert(I <= 0, "I must satisfy I <= 0");
-		return detail::iir_output_z(*this, std::integral_constant<int, I>{});
+		return iir_output_z(std::integral_constant<int, I>{});
 	}
 
 private:
-	template <class U, int M, int I>
-	friend constexpr const U &detail::iir_output_z(const iir_output<U, M> &, std::integral_constant<int, I>);
 
-	template <class U, int M>
-	friend constexpr const U &detail::iir_output_z(const iir_output<U, M> &, std::integral_constant<int, 0>);
+	template <int I>
+	constexpr const T &iir_output_z(std::integral_constant<int, I>) const {
+		return seq_.template top<(-I - 1)>();
+	}
+
+	constexpr iir_result_not_set<T> iir_output_z(std::integral_constant<int, 0>) const {
+		return iir_result_not_set<T>{};
+	}
 
 	const zsequence<T, N> &seq_;
 };
