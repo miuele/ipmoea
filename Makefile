@@ -5,7 +5,7 @@ CXXFLAGS  = -std=$(CXXSTD) -fno-rtti -Wno-unused-variable -Wno-unused-but-set-va
 LDFLAGS   =
 LDLIBS    = $(LDFLAGS) -lstdc++ -lpthread -latomic -lm
 
-TEST_SRC := test.cpp test_parts.cpp test_pid.cpp test_constexpr.cpp
+TEST_SRC := test.cpp test_parts.cpp test_pid.cpp test_constexpr.cpp test_bounded_pid.cpp
 TEST_OBJ := $(TEST_SRC:.cpp=.o)
 TESTS    := $(TEST_OBJ:.o=)
 
@@ -20,6 +20,7 @@ test: test.o
 test_parts: test_parts.o
 test_pid: test_pid.o
 test_constexpr: test_constexpr.o
+test_bounded_pid: test_bounded_pid.o
 
 clean:
 	rm -f $(TEST_OBJ) $(TESTS)

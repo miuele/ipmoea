@@ -79,25 +79,71 @@ private:
 	hpf_first_order<float> hpf_;
 };
 
+struct simple_bounded_pid_dp {
+
+	simple_bounded_pid_dp(float time_step, float lb, float ub, float k_p, float k_i, float k_d, float tf)
+		: k_p_(k_p), k_i_(k_i), k_d_(k_d), tf_(tf), lb_(lb), ub_(ub), integ_(time_step), hpf_(time_step, 1.f / tf)
+	{}
+
+	float operator()(float sp, float pv) {
+
+		float input = sp - pv;
+
+		auto integ = integ_;
+		float unbounded = k_p_ * input + k_i_ * integ(input) + (k_d_ / tf_) * hpf_(-pv);
+
+		if (unbounded >= ub_) {
+			integ_(0.f);
+			return ub_;
+		} else if (unbounded <= lb_) {
+			integ_(0.f);
+			return lb_;
+		} else {
+			integ_ = integ;
+			return unbounded;
+		}
+	}
+
+private:
+	float k_p_, k_i_, k_d_;
+	float tf_;
+	float lb_, ub_;
+	integrator<float> integ_;
+	hpf_first_order<float> hpf_;
+};
+
 int main() {
 
     std::setvbuf(stdin, NULL, _IOLBF, 0);
     std::setvbuf(stdout, NULL, _IOLBF, 0);
 
 	constexpr float h = 0.05f;
-	constexpr float w = 0.4f;
+	constexpr float w = 1.2f;
 
-	second_order_system<float> sys(h, w, 0.75f);
+	second_order_system<float> sys1(h, w, 0.45f);
+	second_order_system<float> sys2(h, w, 0.45f);
 
-	simple_pid pid(h, 50.f, 5.f, 50.f, 0.2f);
+	constexpr float ub = 50.f;
+	constexpr float lb = -50.f;
 
-	float out = 0.f;
+	constexpr float kp = 7.f;
+	constexpr float ki = 3.f;
+	constexpr float kd = 3.f;
+	constexpr float wc = 0.2f;
+
+	simple_pid pid(h, kp, ki, kd, wc);
+	simple_bounded_pid_dp bpid(h, lb, ub, kp, ki, kd, wc);
+
+	float out1 = 0.f;
+	float out2 = 0.f;
     for (;;) {
 		float v;
 		std::scanf("%f", &v);
 
-		float in = pid(v - out);
-		std::printf("%f, %f\n", in / 100.f, out);
-		out = 0.2*sys(in);
+		float in1 = std::clamp(pid(v - out1), lb, ub);
+		float in2 = bpid(v, out2);
+		std::printf("%f, %f, %f, %f\n", in1 / 20.f, out1, in2 / 20.f, out2);
+		out1 = 0.2*sys1(in1);
+		out2 = 0.2*sys2(in2);
     }
 }
