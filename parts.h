@@ -31,8 +31,8 @@ private:
 
 template <class T>
 struct hpf_first_order {
-	constexpr hpf_first_order(T time_step, T cutoff)
-		: prev_value_{}, prev_output_{}, crit_(cutoff * time_step)
+	constexpr hpf_first_order(T time_step, T cutoff, T init = T{})
+		: prev_value_{init}, prev_output_{init}, crit_(cutoff * time_step)
 	{}
 
 	constexpr T operator()(T value) {
@@ -53,8 +53,8 @@ private:
 
 template <class T>
 struct lpf_first_order {
-	constexpr lpf_first_order(T time_step, T cutoff)
-		: prev_value_{}, prev_output_{}, crit_(cutoff * time_step)
+	constexpr lpf_first_order(T time_step, T cutoff, T init = T{})
+		: prev_value_{init}, prev_output_{init}, crit_(cutoff * time_step)
 	{}
 
 	constexpr T operator()(T value) {
