@@ -1,7 +1,7 @@
 CXXSTD   := c++17
 
 CXX      := g++
-CXXFLAGS  = -std=$(CXXSTD) -fno-rtti -Wno-unused-variable -Wno-unused-but-set-variable -Wno-parentheses -Wall -O3
+CXXFLAGS  = -std=$(CXXSTD) -fno-rtti -Wno-unused-variable -Wno-unused-but-set-variable -Wno-parentheses -Wall -O3 -I../
 LDFLAGS   =
 LDLIBS    = $(LDFLAGS) -lstdc++ -lpthread -latomic -lm
 
