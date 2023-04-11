@@ -13,7 +13,7 @@ CXXFLAGS  = -std=$(CXXSTD) -fno-rtti \
 LDFLAGS   =
 LDLIBS    = $(LDFLAGS) -lstdc++ -lm
 
-TEST_SRC := test.cpp test_parts.cpp test_pid.cpp test_constexpr.cpp test_bounded_pid.cpp test_disc_diff.cpp
+TEST_SRC := test.cpp test_parts.cpp test_pid.cpp test_constexpr.cpp test_bounded_pid.cpp test_disc_diff.cpp test_rate_limiter.cpp
 TEST_OBJ := $(TEST_SRC:.cpp=.o)
 TESTS    := $(TEST_OBJ:.o=)
 DEPENDS  := $(TEST_SRC:.cpp=.d)
@@ -31,6 +31,7 @@ test_pid: test_pid.o
 test_constexpr: test_constexpr.o
 test_bounded_pid: test_bounded_pid.o
 test_disc_diff: test_disc_diff.o
+test_rate_limiter: test_rate_limiter.o
 
 -include $(DEPENDS)
 %.o: %.c Makefile

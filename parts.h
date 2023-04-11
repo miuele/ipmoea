@@ -73,6 +73,54 @@ private:
 	T crit_;
 };
 
+template <class T>
+struct differentiator {
+	constexpr differentiator(T time_step, T init = T{})
+		: time_step_(time_step), prev_value_(init)
+	{}
+
+	constexpr T operator()(T value) {
+		const float output = (value - prev_value_) / time_step_;
+
+		prev_value_ = value;
+
+		return output;
+	}
+
+private:
+	T time_step_;
+	T prev_value_;
+};
+
+template <class T>
+struct rate_limiter {
+	constexpr rate_limiter(T time_step, T lower_limit, T upper_limit, T init = T{})
+		: time_step_(time_step)
+		, prev_value_(init)
+		, lower_limit_(lower_limit), upper_limit_(upper_limit)
+	{}
+
+	constexpr T operator()(T value) {
+		const float rate = (value - prev_value_) / time_step_;
+
+		if (rate < lower_limit_) {
+			value = prev_value_ + lower_limit_ * time_step_;
+		} else if (rate > upper_limit_) {
+			value = prev_value_ + upper_limit_ * time_step_;
+		}
+
+		prev_value_ = value;
+
+		return value;
+	}
+
+private:
+	T time_step_;
+	T prev_value_;
+	T lower_limit_;
+	T upper_limit_;
+};
+
 }
 
 }
