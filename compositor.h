@@ -9,12 +9,12 @@ namespace utils {
 
 template <class T, class F, class ...Funcs>
 struct compositor_impl : compositor_impl<T, Funcs...> {
-	compositor_impl(F &&f, Funcs &&...funcs)
+	constexpr compositor_impl(F &&f, Funcs &&...funcs)
 		: compositor_impl<T, Funcs...>(std::forward<Funcs>(funcs)...), f_(std::forward<F>(f))
 	{
 	}
 
-	T operator()(T value) {
+	constexpr T operator()(T value) {
 		return f_(compositor_impl<T, Funcs...>::operator()(value));
 	}
 
@@ -23,11 +23,11 @@ struct compositor_impl : compositor_impl<T, Funcs...> {
 
 template <class T, class F>
 struct compositor_impl<T, F> {
-	compositor_impl(F &&f)
+	constexpr compositor_impl(F &&f)
 		: f_(std::forward<F>(f))
 	{}
 
-	T operator()(T value) {
+	constexpr T operator()(T value) {
 		return f_(value);
 	}
 
@@ -38,18 +38,18 @@ template <class T, class ...Funcs>
 struct compositor
 	: private compositor_impl<T, Funcs...>
 {
-	compositor(Funcs &&...funcs)
+	constexpr compositor(Funcs &&...funcs)
 		: compositor_impl<T, Funcs...>(std::forward<Funcs>(funcs)...)
 	{
 	}
 
-	T operator()(T value) {
+	constexpr T operator()(T value) {
 		return compositor_impl<T, Funcs...>::operator()(value);
 	}
 };
 
 template <class T, class ...Funcs>
-auto compose(Funcs &&...funcs) {
+constexpr auto compose(Funcs &&...funcs) {
 	return compositor<T, Funcs...>(std::forward<Funcs>(funcs)...);
 }
 
