@@ -7,6 +7,11 @@ namespace ipmoea {
 
 namespace utils {
 
+template <class T, std::size_t N>
+constexpr T delta_top(const zseq::zsequence<T, N> &zseq) {
+	return zseq.template top<0>() - zseq.template top<1>();
+}
+
 template <class T>
 struct iir_result_set {
 	T value;
