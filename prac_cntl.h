@@ -1,12 +1,14 @@
 #ifndef PRAC_CNTL
 #define PRAC_CNTL
 
-#include "ipmoea/zsequence.h"
-#include "ipmoea/parts.h"
-#include "ipmoea/utils.h"
+#include "zsequence.h"
+#include "parts.h"
+#include "utils.h"
 
 #include <limits>
 #include <cmath>
+
+namespace ipmoea {
 
 namespace prac_cntl {
 
@@ -67,6 +69,8 @@ private:
 	ipmoea::parts::hpf_first_order<float> hpf_;
 	float pv_0_;
 };
+
+}
 
 }
 
