@@ -121,6 +121,24 @@ private:
 	T upper_limit_;
 };
 
+template <class T>
+struct delta_operator {
+
+	constexpr delta_operator(const T &init)
+		: prev_value_(init)
+	{}
+
+	constexpr auto operator()(const T &value) {
+		auto delta = value - prev_value_;
+		prev_value_ = value;
+		return delta;
+	}
+
+private:
+	T prev_value_;
+};
+
+
 }
 
 }
